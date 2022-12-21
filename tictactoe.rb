@@ -2,13 +2,18 @@ class TicTacToe
   attr_reader :tabuleiro, :winner, :game_status
 
   def initialize
-    @tabuleiro = Array.new(3) { Array.new(3, ' ') }
+    @tabuleiro = Array.new(3) { Array.new(3, '') }
+    @tabuleiro.each_with_index do |linha, i|
+      linha.each_with_index do |element, j|
+        linha[j] = "| #{i+j+1} |"
+      end
+    end
     @game_status = true
   end
 
   def draw
     puts ''
-    @tabuleiro.each { |line| p line }
+    @tabuleiro.each { |line| p line.map {|element|} }
     puts ''
   end
 
@@ -31,8 +36,8 @@ class TicTacToe
   end
 
   def receber_jogada(player)
-    print 'Entre com a linha: '
-    linha = gets.chomp.to_i
+    print 'Escolha um numero que ainda nao foi escolhido (0-9): '
+    pos = gets.chomp.to_i
     if linha > 3
       linha = 3
     elsif linha < 1
