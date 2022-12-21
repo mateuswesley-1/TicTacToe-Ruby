@@ -148,7 +148,7 @@ class Player
 end
 
 jogo = TicTacToe.new
-player = Player.new()
+player = Player.new
 pc = Player.new(team = '0', human = false)
 
 jogo.draw
