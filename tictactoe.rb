@@ -37,7 +37,7 @@ class TicTacToe
       check_winner
     else
       # Recursive function to validate data
-      puts "Entre com uma posicao valida"
+      puts 'Entre com uma posicao valida'
       fazer_jogada(player)
     end
   end
