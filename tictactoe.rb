@@ -44,11 +44,11 @@ class TicTacToe
 
   def receber_jogada(player)
 
-    print 'Escolha um numero que ainda nao foi escolhido (0-9): '
+    print "Jogador #{player.team} Escolha um numero que ainda nao foi escolhido (0-9): "
     num = gets.chomp.to_i
 
     until @pos_disponiveis.include? num
-      print 'Escolha um numero que ainda nao foi escolhido (0-9): '
+      print "Jogador #{player.team} Escolha um numero que ainda nao foi escolhido (0-9): "
       num = gets.chomp.to_i
     end
 
