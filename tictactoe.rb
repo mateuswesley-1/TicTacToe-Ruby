@@ -1,15 +1,14 @@
-require 'pry-byebug'
-
 class TicTacToe
   attr_reader :tabuleiro, :winner, :game_status
+
   def initialize
-    @tabuleiro = Array.new(3) {Array.new(3, ' ')}
+    @tabuleiro = Array.new(3) { Array.new(3, ' ') }
     @game_status = true
   end
 
   def draw
     puts ''
-    @tabuleiro.each{|line| p line}
+    @tabuleiro.each { |line| p line }
     puts ''
   end
 
@@ -19,9 +18,9 @@ class TicTacToe
     ident = hash_jogada.keys[0]
     jogada = hash_jogada[player.team]
 
-    if validar_jogada(jogada[:linha]-1, jogada[:coluna]-1)
-      @tabuleiro[jogada[:linha]-1][jogada[:coluna]-1] = ident
-      #Drawning and checking for winner
+    if validar_jogada(jogada[:linha] - 1, jogada[:coluna] - 1)
+      @tabuleiro[jogada[:linha] - 1][jogada[:coluna] - 1] = ident
+      # Drawning and checking for winner
       draw
       check_winner
     else
@@ -32,31 +31,29 @@ class TicTacToe
   end
 
   def receber_jogada(player)
-    print "Entre com a linha: "
+    print 'Entre com a linha: '
     linha = gets.chomp.to_i
-    if linha>3
+    if linha > 3
       linha = 3
-    elsif linha<1
+    elsif linha < 1
       linha = 1
     end
 
-    print "Entre com a coluna: "
+    print 'Entre com a coluna: '
     coluna = gets.chomp.to_i
-    if coluna>3
+    if coluna > 3
       coluna = 3
-    elsif coluna<1
+    elsif coluna < 1
       coluna = 1
     end
 
-    {player.team => {:linha => linha, :coluna => coluna}}
+    { player.team => { linha: linha, coluna: coluna } }
   end
 
   def validar_jogada(linha, coluna)
-    if @tabuleiro[linha][coluna] == ' '
-      true
-    else
-      false
-    end
+    return false unless @tabuleiro[linha][coluna] == ' '
+
+    true
   end
 
   def check_winner
@@ -65,52 +62,71 @@ class TicTacToe
     # TicTacToe round.
 
     # Lines
-    @tabuleiro.each do |line|
-      if (line[0] == line[1]) && (line[1] == line[2]) && (line[1] != ' ')
-        @game_status = false
-        @winner = line[0]
-        break
-      end
-    end
+    check_lines
 
     # Columns
-    @tabuleiro.transpose().each do |column|
-      if (column[0] == column[1]) && (column[1] == column[2]) && (column[1] != ' ')
-        @game_status = false
-        @winner = column[0]
-        break
-      end
-    end
+    check_columns
 
 
     # Diagonals
-    if (@tabuleiro[0][0] == @tabuleiro[1][1]) && (@tabuleiro[0][0] == @tabuleiro[2][2]) && (@tabuleiro[0][0] != ' ')
+    leading_diagonal
+    secondary_diagonal
+  end
+
+  def check_lines
+    @tabuleiro.each do |line|
+      first_condition = line[0] == line[1]
+      second_condition = line[1] == line[2]
+      has_value = line[1] != ' '
+      next unless first_condition && second_condition && has_value
+
       @game_status = false
-      @winner = @tabuleiro[0][0]
+      @winner = line[0]
+      break
     end
+  end
 
-    if (@tabuleiro[0][2] == @tabuleiro[1][1]) && (@tabuleiro[0][2] == @tabuleiro[2][0]) && (@tabuleiro[0][2] != ' ')
+  def check_columns
+    @tabuleiro.transpose.each do |column|
+      first_condition = column[0] == column[1]
+      second_condition = column[1] == column[2]
+      has_value = column[1] != ' '
+
+      next unless first_condition && second_condition && has_value
+
       @game_status = false
-      @winner = @tabuleiro[0][2]
+      @winner = column[0]
+      break
     end
+  end
 
+  def leading_diagonal
+    first_condition = @tabuleiro[0][0] == @tabuleiro[1][1]
+    second_condition = @tabuleiro[0][0] == @tabuleiro[2][2]
+    has_value = @tabuleiro[0][0] != ' '
+    return unless first_condition && second_condition && has_value
 
- end
+    @game_status = false
+    @winner = @tabuleiro[0][0]
+  end
 
-  def game_match(player_1, player_2)
+  def secondary_diagonal
+    first_condition = @tabuleiro[0][2] == @tabuleiro[1][1]
+    second_condition = @tabuleiro[0][2] == @tabuleiro[2][0]
+    has_value = @tabuleiro[0][2] != ' '
+    return unless  first_condition && second_condition && has_value
+
+    @game_status = false
+    @winner = @tabuleiro[0][2]
+  end
+
+  def game_match(player1, player2)
     while game_status == true
-      fazer_jogada(player_1)
+      fazer_jogada(player1)
+      break unless game_status
 
-      unless game_status
-        break
-      end
-
-      fazer_jogada(player_2)
-
-      unless game_status
-        break
-      end
-
+      fazer_jogada(player2)
+      break unless game_status
     end
   end
 
@@ -123,6 +139,7 @@ end
 class Player
   attr_accessor :winner
   attr_reader :team, :name
+
   def initialize(team = 'x', human = true, winner = nil)
     @team = team
     @human = human
@@ -134,14 +151,9 @@ jogo = TicTacToe.new
 player = Player.new()
 pc = Player.new(team = '0', human = false)
 
-
-
-#Drawing the board before game starts
 jogo.draw
 jogo.game_match(player, pc)
 jogo.congrat_winner
-# the game
-
 
 
 
