@@ -1,30 +1,37 @@
 class TicTacToe
   attr_reader :tabuleiro, :winner, :game_status
+  num_keys = Array(1..9)
+  posicoes_possiveis = Array(0..2).repeated_permutation(2).to_a
 
+  # Numeros sao as keys, e o array [linha, coluna] os valores
+  @@num_pos_hash = [num_keys, posicoes_possiveis].transpose.to_h
   def initialize
-    @tabuleiro = Array.new(3) { Array.new(3, '') }
-    @tabuleiro.each_with_index do |linha, i|
-      linha.each_with_index do |element, j|
-        linha[j] = "| #{i+j+1} |"
-      end
-    end
+    @pos_disponiveis = Array(1..9)
+    @tabuleiro = @pos_disponiveis.each_slice(3).to_a
     @game_status = true
   end
 
+
   def draw
     puts ''
-    @tabuleiro.each { |line| p line.map {|element|} }
+    @tabuleiro.each do |line|
+      line.each {|element| print " |#{element}| "}
+      puts ''
+    end
     puts ''
   end
 
   def fazer_jogada(player)
     # getting player move
+    # { player.team => num }
     hash_jogada = receber_jogada(player)
     ident = hash_jogada.keys[0]
     jogada = hash_jogada[player.team]
 
-    if validar_jogada(jogada[:linha] - 1, jogada[:coluna] - 1)
-      @tabuleiro[jogada[:linha] - 1][jogada[:coluna] - 1] = ident
+    if validar_jogada(jogada)
+      linha = @@num_pos_hash[jogada][0]
+      coluna = @@num_pos_hash[jogada][1]
+      @tabuleiro[linha][coluna] = ident
       # Drawning and checking for winner
       draw
       check_winner
@@ -36,29 +43,25 @@ class TicTacToe
   end
 
   def receber_jogada(player)
+
     print 'Escolha um numero que ainda nao foi escolhido (0-9): '
-    pos = gets.chomp.to_i
-    if linha > 3
-      linha = 3
-    elsif linha < 1
-      linha = 1
+    num = gets.chomp.to_i
+
+    until @pos_disponiveis.include? num
+      print 'Escolha um numero que ainda nao foi escolhido (0-9): '
+      num = gets.chomp.to_i
     end
 
-    print 'Entre com a coluna: '
-    coluna = gets.chomp.to_i
-    if coluna > 3
-      coluna = 3
-    elsif coluna < 1
-      coluna = 1
-    end
-
-    { player.team => { linha: linha, coluna: coluna } }
+    { player.team => num }
   end
 
-  def validar_jogada(linha, coluna)
-    return false unless @tabuleiro[linha][coluna] == ' '
-
-    true
+  def validar_jogada(jogada)
+    unless @pos_disponiveis.include? jogada
+      false
+    else
+      @pos_disponiveis.delete(jogada)
+      true
+    end
   end
 
   def check_winner
@@ -82,7 +85,7 @@ class TicTacToe
     @tabuleiro.each do |line|
       first_condition = line[0] == line[1]
       second_condition = line[1] == line[2]
-      has_value = line[1] != ' '
+      has_value = !(@pos_disponiveis.include? line[1])
       next unless first_condition && second_condition && has_value
 
       @game_status = false
@@ -95,7 +98,7 @@ class TicTacToe
     @tabuleiro.transpose.each do |column|
       first_condition = column[0] == column[1]
       second_condition = column[1] == column[2]
-      has_value = column[1] != ' '
+      has_value = has_value = !(@pos_disponiveis.include? column[0])
 
       next unless first_condition && second_condition && has_value
 
@@ -108,7 +111,7 @@ class TicTacToe
   def leading_diagonal
     first_condition = @tabuleiro[0][0] == @tabuleiro[1][1]
     second_condition = @tabuleiro[0][0] == @tabuleiro[2][2]
-    has_value = @tabuleiro[0][0] != ' '
+    has_value = !(@pos_disponiveis.include? @tabuleiro[0][0])
     return unless first_condition && second_condition && has_value
 
     @game_status = false
@@ -118,7 +121,7 @@ class TicTacToe
   def secondary_diagonal
     first_condition = @tabuleiro[0][2] == @tabuleiro[1][1]
     second_condition = @tabuleiro[0][2] == @tabuleiro[2][0]
-    has_value = @tabuleiro[0][2] != ' '
+    has_value = !(@pos_disponiveis.include? @tabuleiro[0][2])
     return unless  first_condition && second_condition && has_value
 
     @game_status = false
@@ -154,7 +157,7 @@ end
 
 jogo = TicTacToe.new
 player = Player.new
-pc = Player.new(team = '0', human = false)
+pc = Player.new(team = 'O', human = false)
 
 jogo.draw
 jogo.game_match(player, pc)
