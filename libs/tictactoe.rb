@@ -11,7 +11,6 @@ class TicTacToe
     @game_status = true
   end
 
-
   def draw
     puts ''
     @tabuleiro.each do |line|
@@ -143,7 +142,6 @@ class TicTacToe
   end
 end
 
-
 class Player
   attr_accessor :winner
   attr_reader :team, :name
@@ -162,7 +160,6 @@ pc = Player.new(team = 'O', human = false)
 jogo.draw
 jogo.game_match(player, pc)
 jogo.congrat_winner
-
 
 
 
